@@ -3,7 +3,7 @@ name: Daily Snapshot to Google Sheets
 on:
   schedule:
     - cron: '1 0 * * *'  # ogni giorno alle 00:01 UTC
-  workflow_dispatch:     # puoi avviarlo anche manualmente
+  workflow_dispatch:     # avvio manuale
 
 jobs:
   run_snapshot:
@@ -23,11 +23,8 @@ jobs:
           pip install gspread oauth2client
 
       - name: Create creds.json from secret
-  run: |
-    echo "${{ secrets.GOOGLE_CREDS_JSON }}" | base64 --decode > creds.json
+        run: |
+          echo "${{ secrets.GOOGLE_CREDS_JSON }}" | base64 --decode > creds.json
 
       - name: Run snapshot script
         run: python snapshot_scheduler.py
-
-
-

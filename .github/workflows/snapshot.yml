@@ -23,7 +23,11 @@ jobs:
           pip install gspread oauth2client
 
       - name: Create creds.json from secret
-        run: echo "${{ secrets.GOOGLE_CREDS_JSON }}" > creds.json
+  run: |
+    echo "${{ secrets.GOOGLE_CREDS_JSON }}" | base64 --decode > creds.json
 
       - name: Run snapshot script
         run: python snapshot_scheduler.py
+
+
+

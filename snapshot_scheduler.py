@@ -5,11 +5,12 @@ from oauth2client.service_account import ServiceAccountCredentials
 def registra_snapshot_giornaliero():
     today = datetime.date.today().isoformat()
 
-    creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", [
-        "https://spreadsheets.google.com/feeds",
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/drive"
-    ])
+    creds = ServiceAccountCredentials.from_json_keyfile_name("streamlit-credentials.json", [
+    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+])
+
     client = gspread.authorize(creds)
 
     sheet_commesse = client.open("GestioneCommesse").worksheet("Commesse")

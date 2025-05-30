@@ -64,7 +64,7 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=1
 )
 
-name, auth_status, username = authenticator.login(
+auth_status = authenticator.login(
     fields={
         'Form name': 'Login',
         'Username': 'Email',
@@ -88,9 +88,12 @@ elif auth_status is False:
     st.error("Credenziali errate.")
     st.stop()
 
-# ✅ Se login è andato bene
+# ✅ Se login riuscito
+username = authenticator.username
+name = credentials["usernames"][username]["name"]
 authenticator.logout("Logout", "sidebar")
 main_app(name, username)
+
 
 
 

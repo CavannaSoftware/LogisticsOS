@@ -11,6 +11,17 @@ import json
 from PIL import Image
 
 
+# === LOGIN ===
+def connect_sheet():
+    scope = [
+        "https://spreadsheets.google.com/feeds",
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+    creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, scope)
+    client = gspread.authorize(creds)
+    return client.open(SHEET_NAME).worksheet(SHEET_TAB)
+
 
 def load_users():
     sheet = connect_sheet()
@@ -211,16 +222,7 @@ SETTORI_L = {
     ]
 }
 
-# === LOGIN ===
-def connect_sheet():
-    scope = [
-        "https://spreadsheets.google.com/feeds",
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/drive"
-    ]
-    creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, scope)
-    client = gspread.authorize(creds)
-    return client.open(SHEET_NAME).worksheet(SHEET_TAB)
+
 
 
 

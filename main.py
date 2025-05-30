@@ -50,11 +50,19 @@ def registra_snapshot_giornaliero():
     commesse = load_commesse()
     for comm in commesse:
         uscita = comm.get("Uscita Reale", "")
-        ingresso = comm.get("Data Ingresso", "")
+        
+        ingresso = comm.get("Data Ingresso", "").strip()
 
-        # Assicurati che ingresso e uscita siano in formato data
-        if isinstance(ingresso, str):
+        if not ingresso:
+            return  # oppure continue, se sei in un ciclo
+
+        try:
             ingresso = datetime.datetime.strptime(ingresso, "%Y-%m-%d").date()
+        except ValueError:
+            st.warning(f"⚠️ Data di ingresso non valida: '{ingresso}'")
+            return  # oppure continue
+
+
         if uscita and isinstance(uscita, str):
             uscita = datetime.datetime.strptime(uscita, "%Y-%m-%d").date()
 

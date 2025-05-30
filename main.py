@@ -137,11 +137,14 @@ def load_users():
 
     for user in users_data:
         email = user['Email'].strip().lower()
+        nome = user['Nome'].strip()
+        cognome = user['Cognome'].strip()
         credentials["usernames"][email] = {
-            "name": user['Nome'],
+            "name": f"{nome} {cognome}",
             "password": user['Password']
         }
     return credentials
+
 
 
 

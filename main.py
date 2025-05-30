@@ -11,73 +11,6 @@ import json
 from PIL import Image
 
 
-def load_users():
-    sheet = connect_sheet()
-    users_data = sheet.get_all_records()
-    credentials = {"usernames": {}}
-
-    for user in users_data:
-        email = user['Email'].strip().lower()
-        credentials["usernames"][email] = {
-            "name": user['Nome'],
-            "password": user['Password']
-        }
-    return credentials
-
-
-# === INIZIO ===
-st.set_page_config(layout="wide")
-
-if "authenticator" not in st.session_state:
-    credentials = load_users()
-    st.session_state.authenticator = stauth.Authenticate(
-        credentials,
-        cookie_name="cavanna_auth",
-        cookie_key="cavanna2025_key",
-        cookie_expiry_days=1
-    )
-
-authenticator = st.session_state.authenticator
-
-auth_status = st.session_state.get("authentication_status")
-
-from PIL import Image
-@st.cache_data
-def get_logo():
-    return Image.open("logo.png")
-
-
-if auth_status is None:
-    # === LOGO E TITOLO PRIMA DEL LOGIN ===
-    st.image(get_logo(), width=350)
-
-    st.markdown("""
-        <div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>
-        Operations System
-    </div>
-    """, unsafe_allow_html=True)
-
-
-
-if auth_status is None:
-    authenticator.login(
-        fields={
-            'Form name': 'Login',
-            'Username': 'Email',
-            'Password': 'Password',
-            'Login': 'Login'
-        }
-    )
-auth_status = st.session_state.get("authentication_status")
-name = st.session_state.get("name")
-username = st.session_state.get("username")
-
-if auth_status:
-    main_app(name, username)
-elif auth_status is False:
-    st.error("Credenziali errate.")
-else:
-    st.warning("Inserisci le credenziali per accedere.")
 
 
 
@@ -197,6 +130,18 @@ def aggiorna_settore_commessa(codice_commessa, nuovo_settore):
             break
 
 
+def load_users():
+    sheet = connect_sheet()
+    users_data = sheet.get_all_records()
+    credentials = {"usernames": {}}
+
+    for user in users_data:
+        email = user['Email'].strip().lower()
+        credentials["usernames"][email] = {
+            "name": user['Nome'],
+            "password": user['Password']
+        }
+    return credentials
 
 
 
@@ -571,6 +516,64 @@ def main_app(name, username):
     if "snapshot_giornaliero" not in st.session_state:
         registra_snapshot_giornaliero()
         st.session_state["snapshot_giornaliero"] = True
+
+
+# === INIZIO ===
+st.set_page_config(layout="wide")
+
+if "authenticator" not in st.session_state:
+    credentials = load_users()
+    st.session_state.authenticator = stauth.Authenticate(
+        credentials,
+        cookie_name="cavanna_auth",
+        cookie_key="cavanna2025_key",
+        cookie_expiry_days=1
+    )
+
+authenticator = st.session_state.authenticator
+
+auth_status = st.session_state.get("authentication_status")
+
+from PIL import Image
+@st.cache_data
+def get_logo():
+    return Image.open("logo.png")
+
+
+if auth_status is None:
+    # === LOGO E TITOLO PRIMA DEL LOGIN ===
+    st.image(get_logo(), width=350)
+
+    st.markdown("""
+        <div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>
+        Operations System
+    </div>
+    """, unsafe_allow_html=True)
+
+
+
+if auth_status is None:
+    authenticator.login(
+        fields={
+            'Form name': 'Login',
+            'Username': 'Email',
+            'Password': 'Password',
+            'Login': 'Login'
+        }
+    )
+auth_status = st.session_state.get("authentication_status")
+name = st.session_state.get("name")
+username = st.session_state.get("username")
+
+if auth_status:
+    main_app(name, username)
+elif auth_status is False:
+    st.error("Credenziali errate.")
+else:
+    st.warning("Inserisci le credenziali per accedere.")
+
+
+
 
 
 

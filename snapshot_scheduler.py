@@ -25,7 +25,7 @@ def registra_snapshot_giornaliero():
     print(f"[INFO] Trovate {len(commesse)} commesse.")
 
     for comm in commesse:
-        ingresso = comm.get("Data Ingresso", "")
+        ingresso = comm.get("Ingresso", "")
         uscita = comm.get("Uscita Reale", "")
         codice = comm.get("Codice Commessa", "Sconosciuto")
 

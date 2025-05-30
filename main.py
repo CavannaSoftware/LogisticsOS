@@ -535,44 +535,42 @@ def main_app(name, username):
 # === LOGIN E AVVIO APP ===
 st.set_page_config(layout="wide")
 
-if "authenticator" not in st.session_state:
-    credentials = load_users()
-    st.session_state.authenticator = stauth.Authenticate(
-        credentials,
-        cookie_name="cavanna_auth",
-        cookie_key="cavanna2025_key",
-        cookie_expiry_days=1
-    )
+credentials = load_users()
+authenticator = stauth.Authenticate(
+    credentials,
+    cookie_name="cavanna_auth",
+    cookie_key="cavanna2025_key",
+    cookie_expiry_days=1
+)
 
-authenticator = st.session_state.authenticator
+# 🔐 Fai login PRIMA di qualsiasi output
+auth_status = authenticator.login(
+    fields={
+        'Form name': 'Login',
+        'Username': 'Email',
+        'Password': 'Password',
+        'Login': 'Login'
+    },
+    location="main"
+)
 
-auth_status = st.session_state.get("authentication_status")
-
+# Mostra logo e titolo solo se l'utente non ha ancora fatto login
 if auth_status is None:
-    # Logo e descrizione prima del login
     st.image("logo.png", width=350)
     st.markdown("""
         <div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>
             Operations System
         </div>
     """, unsafe_allow_html=True)
+    st.warning("🔐 Inserisci le credenziali per accedere.")
+    st.stop()
 
-    authenticator.login(
-        fields={
-            'Form name': 'Login',
-            'Username': 'Email',
-            'Password': 'Password',
-            'Login': 'Login'
-        }
-    )
-
-auth_status = st.session_state.get("authentication_status")
-name = st.session_state.get("name")
-username = st.session_state.get("username")
-
-if auth_status:
-    main_app(name, username)
+# 🔐 Credenziali errate
 elif auth_status is False:
     st.error("❌ Credenziali errate.")
-else:
-    st.warning("🔐 Inserisci le credenziali per accedere.")
+    st.stop()
+
+# ✅ Login riuscito
+username = authenticator.username
+name = credentials["usernames"][username]["name"]
+main_app(name, username)

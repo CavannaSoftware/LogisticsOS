@@ -41,6 +41,8 @@ def calcola_costo_commessa(codice_commessa, prezzo_mq_giorno=1.5):
 
 def registra_snapshot_giornaliero():
     today = datetime.date.today().isoformat()
+
+    # Autorizzazione e accesso al foglio
     sheet_storico = gspread.authorize(ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, [
         "https://spreadsheets.google.com/feeds",
         "https://www.googleapis.com/auth/spreadsheets",
@@ -48,32 +50,40 @@ def registra_snapshot_giornaliero():
     ])).open(SHEET_NAME).worksheet("Storico Occupazione")
 
     commesse = load_commesse()
-    for comm in commesse:
-        uscita = comm.get("Uscita Reale", "")
-        
-        ingresso = comm.get("Data Ingresso", "").strip()
 
-        if not ingresso:
-            return  # oppure continue, se sei in un ciclo
+    for comm in commesse:
+        ingresso_raw = comm.get("Data Ingresso", "").strip()
+        uscita_raw = comm.get("Uscita Reale", "").strip()
+
+        # Se manca la data di ingresso, salta
+        if not ingresso_raw:
+            continue
 
         try:
-            ingresso = datetime.datetime.strptime(ingresso, "%Y-%m-%d").date()
+            ingresso = datetime.datetime.strptime(ingresso_raw, "%Y-%m-%d").date()
         except ValueError:
-            st.warning(f"⚠️ Data di ingresso non valida: '{ingresso}'")
-            return  # oppure continue
+            st.warning(f"⚠️ Formato data non valido per ingresso: '{ingresso_raw}'")
+            continue
 
-
-        if uscita and isinstance(uscita, str):
-            uscita = datetime.datetime.strptime(uscita, "%Y-%m-%d").date()
+        uscita_dt = None
+        if uscita_raw:
+            try:
+                uscita_dt = datetime.datetime.strptime(uscita_raw, "%Y-%m-%d").date()
+            except ValueError:
+                st.warning(f"⚠️ Formato data non valido per uscita: '{uscita_raw}'")
+                continue
 
         oggi = datetime.date.today()
 
-        # Se la commessa è attiva oggi, registrala
-        if ingresso <= oggi and (uscita == "" or oggi < uscita):
-            mq = int(comm["MQ Occupati"])
-            codice = comm["Codice Commessa"]
-            cliente = comm["Cliente"]
-            sheet_storico.append_row([today, codice, cliente, mq])
+        if ingresso <= oggi and (not uscita_dt or oggi < uscita_dt):
+            try:
+                mq = int(comm["MQ Occupati"])
+                codice = comm["Codice Commessa"]
+                cliente = comm["Cliente"]
+                sheet_storico.append_row([today, codice, cliente, mq])
+                print(f"[OK] Registrata: {codice} - {mq} m²")
+            except Exception as e:
+                st.warning(f"Errore nel salvataggio: {e}")
 
 
 

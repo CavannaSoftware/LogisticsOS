@@ -531,7 +531,7 @@ def get_logo():
 
 st.image(get_logo(), width=350)
 
- st.markdown("""
+st.markdown("""
 <div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>
     Operations System
 </div>

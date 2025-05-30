@@ -10,6 +10,10 @@ import os
 import json
 from PIL import Image
 
+# === CONFIGURAZIONE GOOGLE SHEET ===
+SHEET_NAME = "GestioneCommesse"
+SHEET_TAB = "Utenti"
+CREDENTIALS_FILE = "streamlit-credentials.json"
 
 # === LOGIN ===
 def connect_sheet():

@@ -10,6 +10,18 @@ import os
 import json
 from PIL import Image
 
+
+
+# === CREA IL FILE DI CREDENZIALI SE NON ESISTE ===
+if not os.path.exists("streamlit-credentials.json"):
+    creds_str = os.environ.get("GOOGLE_CREDS_JSON")
+    if creds_str:
+        with open("streamlit-credentials.json", "w") as f:
+            f.write(creds_str)
+    else:
+        raise Exception("Variabile d'ambiente GOOGLE_CREDS_JSON non trovata")
+
+
 # === CONFIGURAZIONE GOOGLE SHEET ===
 SHEET_NAME = "GestioneCommesse"
 SHEET_TAB = "Utenti"
@@ -81,14 +93,6 @@ authenticator.logout("Logout", "sidebar")
 main_app(name, username)
 
 
-# === CREA IL FILE DI CREDENZIALI SE NON ESISTE ===
-if not os.path.exists("streamlit-credentials.json"):
-    creds_str = os.environ.get("GOOGLE_CREDS_JSON")
-    if creds_str:
-        with open("streamlit-credentials.json", "w") as f:
-            f.write(creds_str)
-    else:
-        raise Exception("Variabile d'ambiente GOOGLE_CREDS_JSON non trovata")
 
 
 def calcola_costo_commessa(codice_commessa, prezzo_mq_giorno=1.5):

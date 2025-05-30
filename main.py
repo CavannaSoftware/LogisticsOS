@@ -536,54 +536,39 @@ def main_app(name, username):
 # === INIZIO ===
 st.set_page_config(layout="wide")
 
-# Caricamento credenziali e autenticazione in session_state
-if "authenticator" not in st.session_state:
-    credentials = load_users()
-    st.session_state.authenticator = stauth.Authenticate(
-        credentials,
-        cookie_name="cavanna_auth",
-        cookie_key="cavanna2025_key",
-        cookie_expiry_days=1
-    )
+credentials = load_users()
+authenticator = stauth.Authenticate(
+    credentials,
+    cookie_name="cavanna_auth",
+    cookie_key="cavanna2025_key",
+    cookie_expiry_days=1
+)
+st.session_state.authenticator = authenticator
 
-authenticator = st.session_state.authenticator
+authenticator.login(
+    fields={
+        'Form name': 'Login',
+        'Username': 'Email',
+        'Password': 'Password',
+        'Login': 'Login'
+    },
+    location='main'
+)
 
-# 🔑 Se non autenticato, mostra il form di login
-if st.session_state.get("authentication_status") is None:
-    with st.container():
-        st.image("logo.png", width=350)
-        st.markdown("""
-        <div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>
-            Operations System
-        </div>
-        """, unsafe_allow_html=True)
-
-        authenticator.login(
-            fields={
-                'Form name': 'Login',
-                'Username': 'Email',
-                'Password': 'Password',
-                'Login': 'Login'
-            },
-            location='main'
-        )
-
-# 🔄 Recupera i dati utente sempre dopo login
 auth_status = st.session_state.get("authentication_status")
 username = st.session_state.get("username")
 name = st.session_state.get("name")
 
-# ✅ Login riuscito
 if auth_status:
     main_app(name, username)
     st.stop()
-
-# ❌ Login fallito
 elif auth_status is False:
     st.error("❌ Credenziali errate.")
     st.stop()
-
-# ⏳ In attesa input
 else:
-    st.warning("🔐 Inserisci le credenziali per accedere.")
+    with st.container():
+        st.image("logo.png", width=350)
+        st.markdown("""<div style='...'>Operations System</div>""", unsafe_allow_html=True)
+        st.warning("🔐 Inserisci le credenziali per accedere.")
     st.stop()
+

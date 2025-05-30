@@ -450,7 +450,7 @@ def main_app(name, username):
             ax.text(centro_x, centro_y, settore["label"], ha='center', va='center', fontsize=12, weight='bold')
 
         # Filtro: solo commesse attive (senza data di uscita)
-        commesse_attive = [c for c in commesse if not c["Uscita Reale"]]
+        
         text_centroids, non_inserite = posiziona_commesse(ax, commesse_attive, scelta)
 
         for codice, points in text_centroids.items():
@@ -467,9 +467,11 @@ def main_app(name, username):
         return fig
 
 
-    
+
+    commesse_attive = [c for c in commesse if not c["Uscita Reale"]]
     fig = genera_figura(commesse_attive, scelta)
     st.pyplot(fig)
+
 
 
 

@@ -308,6 +308,10 @@ def posiziona_commesse(ax, commesse, scelta):
 
 # === MAIN APP ===
 def main_app(name, username):
+  
+    st.write("✅ Entrato nella main_app con:", name, username)
+    ...
+
     st.sidebar.success(f"Utente: {name}")
     authenticator.logout("Logout", "sidebar")
 

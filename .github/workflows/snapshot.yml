@@ -22,5 +22,9 @@ jobs:
         run: |
           pip install gspread oauth2client
 
+      - name: Create streamlit-credentials.json from secret
+        run: echo "${{ secrets.GOOGLE_CREDS_JSON }}" > streamlit-credentials.json
+
       - name: Run snapshot script
         run: python snapshot_scheduler.py
+

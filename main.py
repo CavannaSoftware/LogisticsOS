@@ -54,45 +54,7 @@ def load_users():
         }
     return credentials
 
-# === LOGIN INIZIALE ===
-credentials = load_users()
 
-authenticator = stauth.Authenticate(
-    credentials,
-    cookie_name="cavanna_auth",
-    cookie_key="cavanna2025_key",
-    cookie_expiry_days=1
-)
-
-auth_status = authenticator.login(
-    fields={
-        'Form name': 'Login',
-        'Username': 'Email',
-        'Password': 'Password',
-        'Login': 'Login'
-    },
-    location='main'
-)
-
-if auth_status is None:
-    st.image("logo.png", width=350)
-    st.markdown("""
-        <div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>
-            Operations System
-        </div>
-    """, unsafe_allow_html=True)
-    st.warning("Inserisci le credenziali per accedere.")
-    st.stop()
-
-elif auth_status is False:
-    st.error("Credenziali errate.")
-    st.stop()
-
-# ✅ Se login riuscito
-username = authenticator.username
-name = credentials["usernames"][username]["name"]
-authenticator.logout("Logout", "sidebar")
-main_app(name, username)
 
 
 
@@ -541,11 +503,6 @@ def main_app(name, username):
     fig = genera_figura(commesse_attive, scelta)
     st.pyplot(fig)
 
-
-
-
-
-
     
     # === CALCOLO SPAZI ===
     superficie_totale = 0
@@ -573,3 +530,44 @@ def main_app(name, username):
         registra_snapshot_giornaliero()
         st.session_state["snapshot_giornaliero"] = True
 
+
+
+# === LOGIN INIZIALE ===
+credentials = load_users()
+
+authenticator = stauth.Authenticate(
+    credentials,
+    cookie_name="cavanna_auth",
+    cookie_key="cavanna2025_key",
+    cookie_expiry_days=1
+)
+
+auth_status = authenticator.login(
+    fields={
+        'Form name': 'Login',
+        'Username': 'Email',
+        'Password': 'Password',
+        'Login': 'Login'
+    },
+    location='main'
+)
+
+if auth_status is None:
+    st.image("logo.png", width=350)
+    st.markdown("""
+        <div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>
+            Operations System
+        </div>
+    """, unsafe_allow_html=True)
+    st.warning("Inserisci le credenziali per accedere.")
+    st.stop()
+
+elif auth_status is False:
+    st.error("Credenziali errate.")
+    st.stop()
+
+# ✅ Se login riuscito
+username = authenticator.username
+name = credentials["usernames"][username]["name"]
+authenticator.logout("Logout", "sidebar")
+main_app(name, username)

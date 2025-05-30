@@ -563,19 +563,24 @@ if auth_status is None:
         </div>
         """, unsafe_allow_html=True)
 
-        # Login solo se non loggato
-        name, auth_status, username = authenticator.login(
+        
+
+        # Mostra form di login
+        authenticator.login(
             fields={
                 'Form name': 'Login',
                 'Username': 'Email',
                 'Password': 'Password',
                 'Login': 'Login'
-            },
+                },
             location='main'
         )
-        st.session_state["authentication_status"] = auth_status
-        st.session_state["username"] = username
-        st.session_state["name"] = name
+
+        # Leggi lo stato del login dopo aver fatto login
+        auth_status = st.session_state.get("authentication_status")
+        username = st.session_state.get("username")
+        name = st.session_state.get("name")
+
 
 # Rilettura dello stato aggiornato dopo login
 auth_status = st.session_state.get("authentication_status")

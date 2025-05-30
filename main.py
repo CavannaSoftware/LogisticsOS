@@ -348,6 +348,7 @@ def main_app(name, username):
                 if nuovo_settore != comm["Settore"]:
                     aggiorna_settore_commessa(codice_scelto, nuovo_settore)
                 st.success("Commessa aggiornata.")
+                st.rerun()  # 🔁 ricarica la pagina per aggiornare la mappa
 
     with st.sidebar.expander("➕ Inserisci nuova commessa"):
         codice = st.text_input("Codice Commessa")
@@ -413,6 +414,7 @@ def main_app(name, username):
                     f"Attenzione: non c'è spazio sufficiente per tutta la commessa. Mancano ancora {totale_mq} m².")
             else:
                 st.success("Commessa salvata correttamente!")
+                st.rerun()  # 🔁 ricarica la pagina per aggiornare la mappa
 
 
     @st.cache_data

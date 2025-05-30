@@ -8,6 +8,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 import streamlit_authenticator as stauth
 import os
 import json
+from PIL import Image
+
 
 # === CREA IL FILE DI CREDENZIALI SE NON ESISTE ===
 if not os.path.exists("streamlit-credentials.json"):

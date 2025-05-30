@@ -537,6 +537,17 @@ def main_app(name, username, authenticator):
         st.session_state["snapshot_giornaliero"] = True
 
 # === LOGIN ===
+
+
+# === INIZIALIZZA LOGIN ===
+credentials = load_users()
+authenticator = stauth.Authenticate(
+    credentials,
+    cookie_name="cavanna_auth",
+    cookie_key="cavanna2025_key",
+    cookie_expiry_days=1
+)
+
 authenticator.login(
     fields={
         'Form name': 'Login',

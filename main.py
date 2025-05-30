@@ -12,9 +12,58 @@ from PIL import Image
 
 
 
+def load_users():
+    sheet = connect_sheet()
+    users_data = sheet.get_all_records()
+    credentials = {"usernames": {}}
 
+    for user in users_data:
+        email = user['Email'].strip().lower()
+        nome = user['Nome'].strip()
+        cognome = user['Cognome'].strip()
+        credentials["usernames"][email] = {
+            "name": f"{nome} {cognome}",
+            "password": user['Password']
+        }
+    return credentials
 
+# === LOGIN INIZIALE ===
+credentials = load_users()
 
+authenticator = stauth.Authenticate(
+    credentials,
+    cookie_name="cavanna_auth",
+    cookie_key="cavanna2025_key",
+    cookie_expiry_days=1
+)
+
+name, auth_status, username = authenticator.login(
+    fields={
+        'Form name': 'Login',
+        'Username': 'Email',
+        'Password': 'Password',
+        'Login': 'Login'
+    },
+    location='main'
+)
+
+if auth_status is None:
+    st.image("logo.png", width=350)
+    st.markdown("""
+        <div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>
+            Operations System
+        </div>
+    """, unsafe_allow_html=True)
+    st.warning("Inserisci le credenziali per accedere.")
+    st.stop()
+
+elif auth_status is False:
+    st.error("Credenziali errate.")
+    st.stop()
+
+# ✅ Se login è andato bene
+authenticator.logout("Logout", "sidebar")
+main_app(name, username)
 
 
 # === CREA IL FILE DI CREDENZIALI SE NON ESISTE ===
@@ -130,20 +179,7 @@ def aggiorna_settore_commessa(codice_commessa, nuovo_settore):
             break
 
 
-def load_users():
-    sheet = connect_sheet()
-    users_data = sheet.get_all_records()
-    credentials = {"usernames": {}}
 
-    for user in users_data:
-        email = user['Email'].strip().lower()
-        nome = user['Nome'].strip()
-        cognome = user['Cognome'].strip()
-        credentials["usernames"][email] = {
-            "name": f"{nome} {cognome}",
-            "password": user['Password']
-        }
-    return credentials
 
 
 
@@ -524,38 +560,3 @@ def main_app(name, username):
         registra_snapshot_giornaliero()
         st.session_state["snapshot_giornaliero"] = True
 
-
-credentials = load_users()
-authenticator = stauth.Authenticate(
-    credentials,
-    cookie_name="cavanna_auth",
-    cookie_key="cavanna2025_key",
-    cookie_expiry_days=1
-)
-
-auth_status = authenticator.login(
-    fields={
-        'Form name': 'Login',
-        'Username': 'Email',
-        'Password': 'Password',
-        'Login': 'Login'
-    }
-)
-
-st.write("🧑‍💻 auth_status:", auth_status)
-
-if auth_status is None:
-    st.write("🔒 auth_status: None (utente non ha ancora fatto login)")
-    st.stop()
-
-elif auth_status:
-    st.write("✅ auth_status: True (login riuscito)")
-    st.write("🧑‍💻 Username:", authenticator.username)
-    name = authenticator.credentials["usernames"][authenticator.username]["name"]
-    username = authenticator.username
-    st.write("📣 Sto per entrare in main_app")
-    main_app(name, username)
-
-elif auth_status is False:
-    st.write("❌ auth_status: False (login fallito)")
-    st.error("Credenziali errate.")

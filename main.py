@@ -329,6 +329,9 @@ def main_app(name, username):
     st.sidebar.success(f"Utente: {name}")
     authenticator.logout("Logout", "sidebar")
 
+
+
+
     if "login_timestamp_updated" not in st.session_state:
         users_data = get_users_data()
         for i, user in enumerate(users_data):
@@ -532,7 +535,7 @@ def main_app(name, username):
 
 
 
-# === LOGIN E AVVIO APP ===
+# === INIZIO ===
 st.set_page_config(layout="wide")
 
 credentials = load_users()
@@ -543,7 +546,7 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=1
 )
 
-# 🔐 Fai login PRIMA di qualsiasi output
+# Fai login e salva lo stato in variabili
 auth_status = authenticator.login(
     fields={
         'Form name': 'Login',
@@ -554,7 +557,7 @@ auth_status = authenticator.login(
     location="main"
 )
 
-# Mostra logo e titolo solo se l'utente non ha ancora fatto login
+# Mostra logo e messaggio iniziale se non loggato
 if auth_status is None:
     st.image("logo.png", width=350)
     st.markdown("""
@@ -565,12 +568,12 @@ if auth_status is None:
     st.warning("🔐 Inserisci le credenziali per accedere.")
     st.stop()
 
-# 🔐 Credenziali errate
 elif auth_status is False:
     st.error("❌ Credenziali errate.")
     st.stop()
 
-# ✅ Login riuscito
-username = authenticator.username
-name = credentials["usernames"][username]["name"]
-main_app(name, username)
+# Se login riuscito
+if auth_status:
+    username = authenticator.username
+    name = credentials["usernames"][username]["name"]
+    main_app(name, username)

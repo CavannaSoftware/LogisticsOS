@@ -1,16 +1,22 @@
+import os
+import json
 import datetime
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+def get_credentials():
+    cred_dict = json.loads(os.environ["GOOGLE_CREDS_JSON"])  # carica dal secret
+    scope = [
+        "https://spreadsheets.google.com/feeds",
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+    return ServiceAccountCredentials.from_json_keyfile_dict(cred_dict, scope)
+
 def registra_snapshot_giornaliero():
     today = datetime.date.today().isoformat()
 
-    creds = ServiceAccountCredentials.from_json_keyfile_name("streamlit-credentials.json", [
-    "https://spreadsheets.google.com/feeds",
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive"
-])
-
+    creds = get_credentials()
     client = gspread.authorize(creds)
 
     sheet_commesse = client.open("GestioneCommesse").worksheet("Commesse")
@@ -24,11 +30,18 @@ def registra_snapshot_giornaliero():
         if not ingresso:
             continue
 
-        ingresso = datetime.datetime.strptime(ingresso, "%Y-%m-%d").date()
+        try:
+            ingresso = datetime.datetime.strptime(ingresso, "%Y-%m-%d").date()
+        except ValueError:
+            continue
+
         oggi = datetime.date.today()
         uscita_dt = None
         if uscita:
-            uscita_dt = datetime.datetime.strptime(uscita, "%Y-%m-%d").date()
+            try:
+                uscita_dt = datetime.datetime.strptime(uscita, "%Y-%m-%d").date()
+            except ValueError:
+                continue
 
         if ingresso <= oggi and (not uscita_dt or oggi < uscita_dt):
             mq = int(comm["MQ Occupati"])
@@ -39,4 +52,3 @@ def registra_snapshot_giornaliero():
 
 if __name__ == "__main__":
     registra_snapshot_giornaliero()
-

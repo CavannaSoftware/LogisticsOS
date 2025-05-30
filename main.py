@@ -11,6 +11,19 @@ import json
 from PIL import Image
 
 
+def load_users():
+    sheet = connect_sheet()
+    users_data = sheet.get_all_records()
+    credentials = {"usernames": {}}
+
+    for user in users_data:
+        email = user['Email'].strip().lower()
+        credentials["usernames"][email] = {
+            "name": user['Nome'],
+            "password": user['Password']
+        }
+    return credentials
+
 
 # === INIZIO ===
 st.set_page_config(layout="wide")
@@ -225,18 +238,7 @@ def connect_sheet():
     client = gspread.authorize(creds)
     return client.open(SHEET_NAME).worksheet(SHEET_TAB)
 
-def load_users():
-    sheet = connect_sheet()
-    users_data = sheet.get_all_records()
-    credentials = {"usernames": {}}
 
-    for user in users_data:
-        email = user['Email'].strip().lower()
-        credentials["usernames"][email] = {
-            "name": user['Nome'],
-            "password": user['Password']
-        }
-    return credentials
 
 def load_commesse():
     sheet = gspread.authorize(ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, [

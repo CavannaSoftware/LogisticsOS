@@ -530,6 +530,7 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=1
 )
 
+# ⚠️ IMPORTANTE: login PRIMA DI QUALSIASI OUTPUT
 auth_status = authenticator.login(
     fields={
         'Form name': 'Login',
@@ -539,25 +540,19 @@ auth_status = authenticator.login(
     }
 )
 
-# === Logo ===
+# === Se non loggato, mostra solo login (STOP qui)
+if auth_status is None:
+    st.stop()
+
+# === Logo e routing DOPO login ===
 @st.cache_data
 def get_logo():
     return Image.open("logo.png")
 
-if auth_status is None:
-    st.image(get_logo(), width=350)
-    st.markdown("""
-        <div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>
-        Operations System
-    </div>
-    """, unsafe_allow_html=True)
+name = st.session_state.get("name")
+username = st.session_state.get("username")
 
-# === Routing ===
 if auth_status:
-    name = st.session_state.get("name")
-    username = st.session_state.get("username")
     main_app(name, username)
 elif auth_status is False:
     st.error("Credenziali errate.")
-else:
-    st.warning("Inserisci le credenziali per accedere.")

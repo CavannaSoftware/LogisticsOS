@@ -6,6 +6,17 @@ import datetime
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import streamlit_authenticator as stauth
+import os
+import json
+
+# === CREA IL FILE DI CREDENZIALI SE NON ESISTE ===
+if not os.path.exists("streamlit-credentials.json"):
+    creds_str = os.environ.get("GOOGLE_CREDS_JSON")
+    if creds_str:
+        with open("streamlit-credentials.json", "w") as f:
+            f.write(creds_str)
+    else:
+        raise Exception("Variabile d'ambiente GOOGLE_CREDS_JSON non trovata")
 
 
 def calcola_costo_commessa(codice_commessa, prezzo_mq_giorno=1.5):

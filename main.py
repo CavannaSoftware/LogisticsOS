@@ -566,7 +566,7 @@ name = st.session_state.get("name")
 # ✅ LOGIN RIUSCITO
 if auth_status:
     # Salva stato anche nei parametri URL
-    st.query_params["code"] = username
+    st.query_params["code"] = username.strip().lower()
     st.session_state["user_email"] = username
     st.session_state["user_name"] = name
     main_app(name, username, authenticator)
@@ -581,8 +581,13 @@ elif auth_status is False:
 else:
     query_params = st.query_params
     if "code" in query_params:
-        user_email = query_params["code"][0]
+        user_email = query_params["code"][0].strip().lower()
         credentials = load_users()
+
+        # DEBUG: stampa per capire cosa c'è
+        st.write("Email da URL:", user_email)
+        st.write("Utenti:", list(credentials["usernames"].keys()))
+
         if user_email in credentials["usernames"]:
             name = credentials["usernames"][user_email]["name"]
             st.session_state["authentication_status"] = True

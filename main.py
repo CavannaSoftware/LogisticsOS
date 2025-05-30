@@ -10,7 +10,7 @@ import os
 import json
 from PIL import Image
 
-st.set_page_config(layout="wide")
+
 
 # === CREA IL FILE DI CREDENZIALI SE NON ESISTE ===
 if not os.path.exists("streamlit-credentials.json"):
@@ -532,39 +532,47 @@ def main_app(name, username):
 
 
 
-# === LOGIN INIZIALE ===
-credentials = load_users()
+# === LOGIN E AVVIO APP ===
+st.set_page_config(layout="wide")
 
-authenticator = stauth.Authenticate(
-    credentials,
-    cookie_name="cavanna_auth",
-    cookie_key="cavanna2025_key",
-    cookie_expiry_days=1
-)
+if "authenticator" not in st.session_state:
+    credentials = load_users()
+    st.session_state.authenticator = stauth.Authenticate(
+        credentials,
+        cookie_name="cavanna_auth",
+        cookie_key="cavanna2025_key",
+        cookie_expiry_days=1
+    )
 
-name, auth_status, username = authenticator.login(
-    fields={
-        'Form name': 'Login',
-        'Username': 'Email',
-        'Password': 'Password',
-        'Login': 'Login'
-    },
-    location='main'
-)
+authenticator = st.session_state.authenticator
+
+auth_status = st.session_state.get("authentication_status")
 
 if auth_status is None:
+    # Logo e descrizione prima del login
     st.image("logo.png", width=350)
     st.markdown("""
         <div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>
             Operations System
         </div>
     """, unsafe_allow_html=True)
-    st.warning("Inserisci le credenziali per accedere.")
-    st.stop()
 
+    authenticator.login(
+        fields={
+            'Form name': 'Login',
+            'Username': 'Email',
+            'Password': 'Password',
+            'Login': 'Login'
+        }
+    )
+
+auth_status = st.session_state.get("authentication_status")
+name = st.session_state.get("name")
+username = st.session_state.get("username")
+
+if auth_status:
+    main_app(name, username)
 elif auth_status is False:
-    st.error("Credenziali errate.")
-    st.stop()
-
-# ✅ Se login riuscito
-main_app(name, username)
+    st.error("❌ Credenziali errate.")
+else:
+    st.warning("🔐 Inserisci le credenziali per accedere.")

@@ -327,7 +327,11 @@ def main_app(name, username):
     ...
 
     st.sidebar.success(f"Utente: {name}")
-    authenticator.logout("Logout", "sidebar")
+    if st.sidebar.button("Logout"):
+        st.experimental_set_query_params()  # Pulisce l'URL
+        st.session_state.clear()
+        st.rerun()
+
 
 
 
@@ -533,18 +537,7 @@ def main_app(name, username):
         registra_snapshot_giornaliero()
         st.session_state["snapshot_giornaliero"] = True
 
-# === INIZIO ===
-st.set_page_config(layout="wide")
-
-credentials = load_users()
-authenticator = stauth.Authenticate(
-    credentials,
-    cookie_name="cavanna_auth",
-    cookie_key="cavanna2025_key",
-    cookie_expiry_days=1
-)
-st.session_state.authenticator = authenticator
-
+# === LOGIN ===
 authenticator.login(
     fields={
         'Form name': 'Login',
@@ -555,20 +548,43 @@ authenticator.login(
     location='main'
 )
 
+# === STATO DOPO LOGIN ===
 auth_status = st.session_state.get("authentication_status")
 username = st.session_state.get("username")
 name = st.session_state.get("name")
 
+# ✅ LOGIN RIUSCITO
 if auth_status:
+    # Salva stato anche nei parametri URL
+    st.experimental_set_query_params(code=username)
+    st.session_state["user_email"] = username
+    st.session_state["user_name"] = name
     main_app(name, username)
     st.stop()
+
+# ❌ LOGIN FALLITO
 elif auth_status is False:
     st.error("❌ Credenziali errate.")
     st.stop()
-else:
-    with st.container():
-        st.image("logo.png", width=350)
-        st.markdown("""<div style='...'>Operations System</div>""", unsafe_allow_html=True)
-        st.warning("🔐 Inserisci le credenziali per accedere.")
-    st.stop()
 
+# ⏳ NESSUN LOGIN ANCORA → PROVA RIPRISTINO DA URL
+else:
+    query_params = st.experimental_get_query_params()
+    if "code" in query_params:
+        user_email = query_params["code"][0]
+        credentials = load_users()
+        if user_email in credentials["usernames"]:
+            name = credentials["usernames"][user_email]["name"]
+            st.session_state["authentication_status"] = True
+            st.session_state["username"] = user_email
+            st.session_state["name"] = name
+            st.experimental_rerun()
+        else:
+            st.warning("⚠️ Codice nel link non valido.")
+            st.stop()
+    else:
+        with st.container():
+            st.image("logo.png", width=350)
+            st.markdown("""<div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>Operations System</div>""", unsafe_allow_html=True)
+            st.warning("🔐 Inserisci le credenziali per accedere.")
+        st.stop()

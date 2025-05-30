@@ -580,22 +580,24 @@ elif auth_status is False:
 # ⏳ NESSUN LOGIN ANCORA → PROVA RIPRISTINO DA URL
 else:
     query_params = st.query_params
+
+    # 🔍 DEBUG URL
     if "code" in query_params:
         user_email = query_params["code"][0].strip().lower()
         credentials = load_users()
 
-        # DEBUG: stampa per capire cosa c'è
-        st.write("Email da URL:", user_email)
-        st.write("Utenti:", list(credentials["usernames"].keys()))
+        st.write("🔍 EMAIL DA URL:", user_email)
+        st.write("✅ UTENTI CARICATI:", credentials["usernames"].keys())
 
         if user_email in credentials["usernames"]:
             name = credentials["usernames"][user_email]["name"]
             st.session_state["authentication_status"] = True
             st.session_state["username"] = user_email
             st.session_state["name"] = name
+            st.success("✅ Sessione ripristinata. Ricarico...")
             st.rerun()
         else:
-            st.warning("⚠️ Codice nel link non valido.")
+            st.error("⚠️ Codice nel link non valido.")
             st.stop()
     else:
         with st.container():

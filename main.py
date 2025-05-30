@@ -327,7 +327,7 @@ def main_app(name, username, authenticator):
 
     st.sidebar.success(f"Utente: {name}")
     if st.sidebar.button("Logout"):
-        st.experimental_set_query_params()  # Pulisce l'URL
+        st.query_params.clear()  # Pulisce l'URL
         st.session_state.clear()
         st.rerun()
 
@@ -566,7 +566,7 @@ name = st.session_state.get("name")
 # ✅ LOGIN RIUSCITO
 if auth_status:
     # Salva stato anche nei parametri URL
-    st.experimental_set_query_params(code=username)
+    st.query_params["code"] = username
     st.session_state["user_email"] = username
     st.session_state["user_name"] = name
     main_app(name, username, authenticator)
@@ -579,7 +579,7 @@ elif auth_status is False:
 
 # ⏳ NESSUN LOGIN ANCORA → PROVA RIPRISTINO DA URL
 else:
-    query_params = st.experimental_get_query_params()
+    query_params = st.query_params
     if "code" in query_params:
         user_email = query_params["code"][0]
         credentials = load_users()
@@ -588,7 +588,7 @@ else:
             st.session_state["authentication_status"] = True
             st.session_state["username"] = user_email
             st.session_state["name"] = name
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.warning("⚠️ Codice nel link non valido.")
             st.stop()

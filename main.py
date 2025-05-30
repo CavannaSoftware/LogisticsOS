@@ -548,13 +548,8 @@ if "authenticator" not in st.session_state:
 
 authenticator = st.session_state.authenticator
 
-# Prova a leggere lo stato attuale dal cookie
-auth_status = st.session_state.get("authentication_status")
-username = st.session_state.get("username")
-name = st.session_state.get("name")
-
-# Se non c'è stato di autenticazione, mostra login
-if auth_status is None:
+# 🔑 Se non autenticato, mostra il form di login
+if st.session_state.get("authentication_status") is None:
     with st.container():
         st.image("logo.png", width=350)
         st.markdown("""
@@ -563,36 +558,32 @@ if auth_status is None:
         </div>
         """, unsafe_allow_html=True)
 
-        
-
-        # Mostra form di login
         authenticator.login(
             fields={
                 'Form name': 'Login',
                 'Username': 'Email',
                 'Password': 'Password',
                 'Login': 'Login'
-                },
+            },
             location='main'
         )
 
-        # Leggi lo stato del login dopo aver fatto login
-        auth_status = st.session_state.get("authentication_status")
-        username = st.session_state.get("username")
-        name = st.session_state.get("name")
-
-
-# Rilettura dello stato aggiornato dopo login
+# 🔄 Recupera i dati utente sempre dopo login
 auth_status = st.session_state.get("authentication_status")
 username = st.session_state.get("username")
 name = st.session_state.get("name")
 
-# Verifica finale dello stato login
-if auth_status is False:
+# ✅ Login riuscito
+if auth_status:
+    main_app(name, username)
+    st.stop()
+
+# ❌ Login fallito
+elif auth_status is False:
     st.error("❌ Credenziali errate.")
     st.stop()
-elif auth_status is None:
+
+# ⏳ In attesa input
+else:
     st.warning("🔐 Inserisci le credenziali per accedere.")
     st.stop()
-else:
-    main_app(name, username)

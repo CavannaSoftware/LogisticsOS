@@ -578,30 +578,23 @@ elif auth_status is False:
     st.stop()
 
 # ⏳ NESSUN LOGIN ANCORA → PROVA RIPRISTINO DA URL
-else:
-    query_params = st.query_params
+query_params = st.query_params
 
-    # 🔍 DEBUG URL
-    if "code" in query_params:
-        user_email = query_params["code"][0].strip().lower()
-        credentials = load_users()
+if "code" in query_params:
+    user_email = query_params["code"].strip().lower()
+    credentials = load_users()
 
-        st.write("🔍 EMAIL DA URL:", user_email)
-        st.write("✅ UTENTI CARICATI:", credentials["usernames"].keys())
+    st.write("🔍 EMAIL DA URL:", user_email)
+    st.write("✅ UTENTI CARICATI:", list(credentials["usernames"].keys()))
 
-        if user_email in credentials["usernames"]:
-            name = credentials["usernames"][user_email]["name"]
-            st.session_state["authentication_status"] = True
-            st.session_state["username"] = user_email
-            st.session_state["name"] = name
-            st.success("✅ Sessione ripristinata. Ricarico...")
-            st.rerun()
-        else:
-            st.error("⚠️ Codice nel link non valido.")
-            st.stop()
+    if user_email in credentials["usernames"]:
+        name = credentials["usernames"][user_email]["name"]
+        st.session_state["authentication_status"] = True
+        st.session_state["username"] = user_email
+        st.session_state["name"] = name
+        st.success("✅ Sessione ripristinata. Ricarico...")
+        st.rerun()
     else:
-        with st.container():
-            st.image("logo.png", width=350)
-            st.markdown("""<div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>Operations System</div>""", unsafe_allow_html=True)
-            st.warning("🔐 Inserisci le credenziali per accedere.")
+        st.error("⚠️ Codice nel link non valido.")
         st.stop()
+

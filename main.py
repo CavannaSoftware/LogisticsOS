@@ -321,8 +321,7 @@ def posiziona_commesse(ax, commesse, scelta):
 
 
 # === MAIN APP ===
-def main_app(name, username):
-  
+def main_app(name, username, authenticator):
     st.write("✅ Entrato nella main_app con:", name, username)
     ...
 
@@ -559,7 +558,7 @@ if auth_status:
     st.experimental_set_query_params(code=username)
     st.session_state["user_email"] = username
     st.session_state["user_name"] = name
-    main_app(name, username)
+    main_app(name, username, authenticator)
     st.stop()
 
 # ❌ LOGIN FALLITO

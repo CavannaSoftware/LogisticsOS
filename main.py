@@ -499,8 +499,8 @@ def main_app(name, username):
     st.metric("Rimanente", f"{int(superficie_disponibile)} m²")
 
     if "snapshot_giornaliero" not in st.session_state:
-    registra_snapshot_giornaliero()
-    st.session_state["snapshot_giornaliero"] = True
+        registra_snapshot_giornaliero()
+        st.session_state["snapshot_giornaliero"] = True
 
 
 

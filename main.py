@@ -530,7 +530,7 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=1
 )
 
-# ⚠️ IMPORTANTE: login PRIMA DI QUALSIASI OUTPUT
+# 👉 Fai login prima di qualsiasi output visivo
 auth_status = authenticator.login(
     fields={
         'Form name': 'Login',
@@ -540,19 +540,16 @@ auth_status = authenticator.login(
     }
 )
 
-# === Se non loggato, mostra solo login (STOP qui)
+# 🔒 Se non loggato (ancora nessuna azione): blocca qui
 if auth_status is None:
     st.stop()
 
-# === Logo e routing DOPO login ===
-@st.cache_data
-def get_logo():
-    return Image.open("logo.png")
-
-name = st.session_state.get("name")
-username = st.session_state.get("username")
-
+# ✅ Se login riuscito
 if auth_status:
+    name = authenticator.credentials["usernames"][authenticator.username]["name"]
+    username = authenticator.username
     main_app(name, username)
+
+# ❌ Se credenziali errate
 elif auth_status is False:
     st.error("Credenziali errate.")

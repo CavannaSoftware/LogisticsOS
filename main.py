@@ -522,10 +522,6 @@ def main_app(name, username):
         st.session_state["snapshot_giornaliero"] = True
 
 
-# === INIZIO ===
-st.set_page_config(layout="wide")
-
-# === Autenticazione ===
 credentials = load_users()
 authenticator = stauth.Authenticate(
     credentials,
@@ -534,7 +530,6 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=1
 )
 
-# 👉 Fai login prima di qualsiasi output visivo
 auth_status = authenticator.login(
     fields={
         'Form name': 'Login',
@@ -544,16 +539,20 @@ auth_status = authenticator.login(
     }
 )
 
-# 🔒 Se non loggato (ancora nessuna azione): blocca qui
+st.write("🧑‍💻 auth_status:", auth_status)
+
 if auth_status is None:
+    st.write("🔒 auth_status: None (utente non ha ancora fatto login)")
     st.stop()
 
-# ✅ Se login riuscito
-if auth_status:
+elif auth_status:
+    st.write("✅ auth_status: True (login riuscito)")
+    st.write("🧑‍💻 Username:", authenticator.username)
     name = authenticator.credentials["usernames"][authenticator.username]["name"]
     username = authenticator.username
+    st.write("📣 Sto per entrare in main_app")
     main_app(name, username)
 
-# ❌ Se credenziali errate
 elif auth_status is False:
+    st.write("❌ auth_status: False (login fallito)")
     st.error("Credenziali errate.")

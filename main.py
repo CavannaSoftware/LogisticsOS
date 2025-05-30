@@ -533,47 +533,55 @@ def main_app(name, username):
         registra_snapshot_giornaliero()
         st.session_state["snapshot_giornaliero"] = True
 
-
-
 # === INIZIO ===
 st.set_page_config(layout="wide")
 
-credentials = load_users()
-authenticator = stauth.Authenticate(
-    credentials,
-    cookie_name="cavanna_auth",
-    cookie_key="cavanna2025_key",
-    cookie_expiry_days=1
-)
+# Carica utenti e crea autenticatore nella sessione
+if "authenticator" not in st.session_state:
+    credentials = load_users()
+    st.session_state.authenticator = stauth.Authenticate(
+        credentials,
+        cookie_name="cavanna_auth",
+        cookie_key="cavanna2025_key",
+        cookie_expiry_days=1
+    )
 
-# Fai login e salva lo stato in variabili
-auth_status = authenticator.login(
-    fields={
-        'Form name': 'Login',
-        'Username': 'Email',
-        'Password': 'Password',
-        'Login': 'Login'
-    },
-    location="main"
-)
+authenticator = st.session_state.authenticator
 
-# Mostra logo e messaggio iniziale se non loggato
-if auth_status is None:
-    st.image("logo.png", width=350)
-    st.markdown("""
+# 🔐 Effettua login se non già fatto
+if "authentication_status" not in st.session_state:
+    with st.container():
+        st.image("logo.png", width=350)
+        st.markdown("""
         <div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>
             Operations System
         </div>
-    """, unsafe_allow_html=True)
-    st.warning("🔐 Inserisci le credenziali per accedere.")
+        """, unsafe_allow_html=True)
+        authenticator.login(
+            fields={
+                'Form name': 'Login',
+                'Username': 'Email',
+                'Password': 'Password',
+                'Login': 'Login'
+            },
+            location='main'
+        )
+
+# 🔍 Recupera stato login
+auth_status = st.session_state.get("authentication_status")
+username = st.session_state.get("username")
+name = st.session_state.get("name")
+
+# ⚠️ Login non effettuato
+if auth_status is None:
+    st.warning("Inserisci le credenziali per accedere.")
     st.stop()
 
-elif auth_status is False:
-    st.error("❌ Credenziali errate.")
+# ❌ Login fallito
+if auth_status is False:
+    st.error("Credenziali errate.")
     st.stop()
 
-# Se login riuscito
+# ✅ Login riuscito
 if auth_status:
-    username = authenticator.username
-    name = credentials["usernames"][username]["name"]
     main_app(name, username)

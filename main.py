@@ -10,7 +10,7 @@ import os
 import json
 from PIL import Image
 
-
+st.set_page_config(layout="wide")
 
 # === CREA IL FILE DI CREDENZIALI SE NON ESISTE ===
 if not os.path.exists("streamlit-credentials.json"):
@@ -542,7 +542,7 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=1
 )
 
-auth_status = authenticator.login(
+name, auth_status, username = authenticator.login(
     fields={
         'Form name': 'Login',
         'Username': 'Email',
@@ -567,7 +567,4 @@ elif auth_status is False:
     st.stop()
 
 # ✅ Se login riuscito
-username = authenticator.username
-name = credentials["usernames"][username]["name"]
-authenticator.logout("Logout", "sidebar")
 main_app(name, username)

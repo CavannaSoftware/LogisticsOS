@@ -49,7 +49,7 @@ def registra_snapshot_giornaliero():
         "https://www.googleapis.com/auth/drive"
     ])).open(SHEET_NAME).worksheet("Storico Occupazione")
 
-    commesse = load_commesse()
+    commesse = get_commesse()
 
     for comm in commesse:
         ingresso_raw = comm.get("Data Ingresso", "").strip()
@@ -184,6 +184,17 @@ def load_commesse():
     ])).open(SHEET_NAME).worksheet("Commesse")
     return sheet.get_all_records()
 
+
+@st.cache_data(ttl=60)
+def get_commesse():
+    return load_commesse()
+
+@st.cache_data(ttl=60)
+def get_users_data():
+    sheet = connect_sheet()
+    return sheet.get_all_records()
+
+
 def salva_commessa(dati_commessa):
     sheet = gspread.authorize(ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, [
         "https://spreadsheets.google.com/feeds",
@@ -291,18 +302,21 @@ def main_app(name, username):
     st.sidebar.success(f"Utente: {name}")
     authenticator.logout("Logout", "sidebar")
 
-    sheet = connect_sheet()
-    users_data = sheet.get_all_records()
-    for i, user in enumerate(users_data):
-        if user['Email'].strip().lower() == username:
-            now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            sheet.update_cell(i + 2, 6, now)
-            break
+    if "login_timestamp_updated" not in st.session_state:
+        users_data = get_users_data()
+        for i, user in enumerate(users_data):
+            if user['Email'].strip().lower() == username:
+                now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                sheet = connect_sheet()
+                sheet.update_cell(i + 2, 6, now)
+                st.session_state["login_timestamp_updated"] = True
+                break
+
 
     st.title("Gestione Magazzino - Mappa Capannoni")
 
     scelta = st.selectbox("Seleziona il capannone:", ["Capannone Principale", "Capannone Secondario"])
-    commesse = load_commesse()
+    commesse = get_commesse()
 
     with st.sidebar.expander("✏️ Modifica commessa"):
         codici = [c["Codice Commessa"] for c in commesse if c["Codice Commessa"]]
@@ -400,54 +414,68 @@ def main_app(name, username):
             else:
                 st.success("Commessa salvata correttamente!")
 
-    fig, ax = plt.subplots(figsize=(12, 7))
-    capannone_color = 'skyblue'
 
-    if scelta == "Capannone Principale":
-        ax.set_xlim(0, 50)
-        ax.set_ylim(0, 40)
-        ax.add_patch(Rectangle((0, 0), 50, 40, facecolor=capannone_color))
-        ax.add_patch(Rectangle((0, 33), 5, 7, facecolor='green'))
-        ax.add_patch(Rectangle((9, 0), 10, 15, facecolor='gold'))
-        ax.add_patch(Rectangle((31, 0), 10, 20, facecolor='gold'))
-    elif scelta == "Capannone Secondario":
-        ax.set_xlim(0, 25)
-        ax.set_ylim(0, 40)
-        ax.add_patch(Rectangle((0, 0), 25, 40, facecolor=capannone_color))
-        ax.add_patch(Rectangle((6, 0), 10, 15, facecolor='gold'))
+    @st.cache_data
+    def genera_figura(commesse_attive, scelta):
+        fig, ax = plt.subplots(figsize=(12, 7))
+        capannone_color = 'skyblue'
 
-    for settore in SETTORI_DEF.get(scelta, []):
-        ax.add_patch(Rectangle((settore["x"], settore["y"]), settore["w"], settore["h"], fill=False, edgecolor="black", linewidth=2))
-        ax.text(settore["x"] + settore["w"] / 2, settore["y"] + settore["h"] / 2, settore["label"], ha="center", va="center", fontsize=12, weight="bold")
+        if scelta == "Capannone Principale":
+            ax.set_xlim(0, 50)
+            ax.set_ylim(0, 40)
+            ax.add_patch(Rectangle((0, 0), 50, 40, facecolor=capannone_color))
+            ax.add_patch(Rectangle((0, 33), 5, 7, facecolor='green'))
+            ax.add_patch(Rectangle((9, 0), 10, 15, facecolor='gold'))
+            ax.add_patch(Rectangle((31, 0), 10, 20, facecolor='gold'))
+        elif scelta == "Capannone Secondario":
+            ax.set_xlim(0, 25)
+            ax.set_ylim(0, 40)
+            ax.add_patch(Rectangle((0, 0), 25, 40, facecolor=capannone_color))
+            ax.add_patch(Rectangle((6, 0), 10, 15, facecolor='gold'))
 
-    for settore in SETTORI_L.get(scelta, []):
-        poly = Polygon(settore["points"], closed=True, facecolor=capannone_color, edgecolor='black', linewidth=2)
-        ax.add_patch(poly)
-        xs, ys = zip(*settore["points"])
-        centro_x = sum(xs) / len(xs)
-        centro_y = sum(ys) / len(ys)
-        if settore["label"] == "1A":
-            centro_x += 5
-        elif settore["label"] == "3A":
-            centro_x += 3  # Sposta verso destra
-        ax.text(centro_x, centro_y, settore["label"], ha='center', va='center', fontsize=12, weight='bold')
+        for settore in SETTORI_DEF.get(scelta, []):
+            ax.add_patch(Rectangle((settore["x"], settore["y"]), settore["w"], settore["h"], fill=False, edgecolor="black", linewidth=2))
+            ax.text(settore["x"] + settore["w"] / 2, settore["y"] + settore["h"] / 2, settore["label"], ha="center", va="center", fontsize=12, weight="bold")
 
-    # Filtro: solo commesse attive (senza data di uscita)
-    commesse_attive = [c for c in commesse if not c["Uscita Reale"]]
-    text_centroids, non_inserite = posiziona_commesse(ax, commesse_attive, scelta)
+        for settore in SETTORI_L.get(scelta, []):
+            poly = Polygon(settore["points"], closed=True, facecolor=capannone_color, edgecolor='black', linewidth=2)
+            ax.add_patch(poly)
+            xs, ys = zip(*settore["points"])
+            centro_x = sum(xs) / len(xs)
+            centro_y = sum(ys) / len(ys)
+            if settore["label"] == "1A":
+                centro_x += 5
+            elif settore["label"] == "3A":
+                centro_x += 3  # Sposta verso destra
+            ax.text(centro_x, centro_y, settore["label"], ha='center', va='center', fontsize=12, weight='bold')
 
-    for codice, points in text_centroids.items():
-        cx = sum(p[0] for p in points) / len(points)
-        cy = sum(p[1] for p in points) / len(points)
-        ax.text(cx, cy, codice, ha='center', va='center', fontsize=6, color='white', weight='bold')
+        # Filtro: solo commesse attive (senza data di uscita)
+        commesse_attive = [c for c in commesse if not c["Uscita Reale"]]
+        text_centroids, non_inserite = posiziona_commesse(ax, commesse_attive, scelta)
 
-    for codice, points in text_centroids.items():
-        cx = sum(p[0] for p in points) / len(points)
-        cy = sum(p[1] for p in points) / len(points)
-        ax.text(cx, cy, codice, ha='center', va='center', fontsize=6, color='white', weight='bold')
+        for codice, points in text_centroids.items():
+            cx = sum(p[0] for p in points) / len(points)
+            cy = sum(p[1] for p in points) / len(points)
+            ax.text(cx, cy, codice, ha='center', va='center', fontsize=6, color='white', weight='bold')
 
-    ax.set_aspect('equal')
+        for codice, points in text_centroids.items():
+            cx = sum(p[0] for p in points) / len(points)
+            cy = sum(p[1] for p in points) / len(points)
+            ax.text(cx, cy, codice, ha='center', va='center', fontsize=6, color='white', weight='bold')
+
+        ax.set_aspect('equal')
+        return fig
+
+
+    
+    fig = genera_figura(commesse_attive, scelta)
     st.pyplot(fig)
+
+
+
+
+
+    
     # === CALCOLO SPAZI ===
     superficie_totale = 0
     for settore in SETTORI_DEF.get(scelta, []):
@@ -470,8 +498,10 @@ def main_app(name, username):
     st.metric("Occupato", f"{superficie_occupata} m²")
     st.metric("Rimanente", f"{int(superficie_disponibile)} m²")
 
-    # === SALVA STORICO OCCUPAZIONE GIORNALIERA ===
+    if "snapshot_giornaliero" not in st.session_state:
     registra_snapshot_giornaliero()
+    st.session_state["snapshot_giornaliero"] = True
+
 
 
 # === INIZIO ===
@@ -493,7 +523,14 @@ auth_status = st.session_state.get("authentication_status")
 
 if auth_status is None:
     # === LOGO E TITOLO PRIMA DEL LOGIN ===
- st.image("logo.png", width=350)
+ from PIL import Image
+
+@st.cache_data
+def get_logo():
+    return Image.open("logo.png")
+
+st.image(get_logo(), width=350)
+
  st.markdown("""
 <div style='font-size: 28px; font-weight: bold; color: #004080; margin-top: 10px;'>
     Operations System

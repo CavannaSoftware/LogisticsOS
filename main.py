@@ -597,7 +597,7 @@ st.markdown("""
     <style>
     html, body, .stApp {
         background-image: 
-            linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), 
+            linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), 
             url("https://raw.githubusercontent.com/CavannaSoftware/LogisticsOS/main/sfondo.png");
         background-size: cover;
         background-position: center;

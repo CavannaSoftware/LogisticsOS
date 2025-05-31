@@ -595,7 +595,7 @@ st.markdown("<div class='custom-title'>OPERATIONS SYSTEM</div>", unsafe_allow_ht
 st.markdown("""
     <style>
     body {
-        background-image: url("https://raw.githubusercontent.com/tuo-utente/tuo-repo/main/background.jpg");
+        background-image: url("https://raw.githubusercontent.com/CavannaSoftware/LogisticsOS/main/sfondo.png");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;

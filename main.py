@@ -549,10 +549,10 @@ authenticator = stauth.Authenticate(
 )
 
 
-# === LOGO E TITOLO NELLA PAGINA DI LOGIN ===
-logo_path = "logo.png"  # Cambia con il tuo percorso o URL
 
-# Inietta font Montserrat (Google Fonts)
+
+
+# === LOGO E TITOLO NELLA PAGINA DI LOGIN ===
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
@@ -573,18 +573,21 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Mostra logo centrato
-if os.path.exists(logo_path):
-    st.markdown(f"""
-        <div class='center-logo'>
-            <img src="data:image/png;base64,{Image.open(logo_path).convert("RGB").tobytes().hex()}" width="150">
-        </div>
-    """, unsafe_allow_html=True)
-else:
-    st.image(logo_path, width=150)
+# ✅ Mostra logo da file locale
+st.markdown(
+    """
+    <div class='center-logo'>
+        <img src='logo.png' width='150'>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-# Mostra titolo centrato con Montserrat
+# ✅ Testo con font Montserrat
 st.markdown("<div class='custom-title'>Gestione Magazzino - Cavanna</div>", unsafe_allow_html=True)
+
+
+
 
 
 

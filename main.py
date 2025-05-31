@@ -586,7 +586,7 @@ st.markdown(
 )
 
 # ✅ Testo con font Montserrat
-st.markdown("<div class='custom-title'>Gestione Magazzino - Cavanna</div>", unsafe_allow_html=True)
+st.markdown("<div class='custom-title'>OPERATIONS SYSTEM</div>", unsafe_allow_html=True)
 
 
 

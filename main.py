@@ -563,7 +563,7 @@ st.markdown("""
         font-family: 'Montserrat', sans-serif;
         font-size: 28px;
         font-weight: 400;
-        letter-spacing: 10px;
+        letter-spacing: 20px;
         margin-top: 10px;
     }
 

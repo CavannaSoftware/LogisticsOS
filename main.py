@@ -322,8 +322,8 @@ def posiziona_commesse(ax, commesse, scelta):
 
 # === MAIN APP ===
 def main_app(name, username, authenticator):
-    st.write("✅ Entrato nella main_app con:", name, username)
-    ...
+   # st.write("✅ Entrato nella main_app con:", name, username)
+  #  ...
 
     st.sidebar.success(f"Utente: {name}")
     if st.sidebar.button("Logout"):
@@ -633,8 +633,8 @@ if "code" in query_params:
     user_email = query_params["code"].strip().lower()
     credentials = load_users()
 
-    st.write("🔍 EMAIL DA URL:", user_email)
-    st.write("✅ UTENTI CARICATI:", list(credentials["usernames"].keys()))
+   # st.write("🔍 EMAIL DA URL:", user_email)
+    #st.write("✅ UTENTI CARICATI:", list(credentials["usernames"].keys()))
 
     if user_email in credentials["usernames"]:
         name = credentials["usernames"][user_email]["name"]

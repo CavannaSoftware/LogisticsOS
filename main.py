@@ -562,6 +562,8 @@ st.markdown("""
         color: #30404dff;
         font-family: 'Montserrat', sans-serif;
         font-size: 28px;
+        font-weight: 400;
+        letter-spacing: 3px;
         margin-top: 10px;
     }
 

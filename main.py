@@ -591,6 +591,18 @@ st.markdown(
 # ✅ Testo con font Montserrat
 st.markdown("<div class='custom-title'>OPERATIONS SYSTEM</div>", unsafe_allow_html=True)
 
+# === STILE SFONDO ===
+st.markdown("""
+    <style>
+    body {
+        background-image: url("https://raw.githubusercontent.com/tuo-utente/tuo-repo/main/background.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 
 

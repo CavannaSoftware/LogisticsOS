@@ -548,6 +548,47 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days=1
 )
 
+
+# === LOGO E TITOLO NELLA PAGINA DI LOGIN ===
+logo_path = "logo.png"  # Cambia con il tuo percorso o URL
+
+# Inietta font Montserrat (Google Fonts)
+st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
+
+    .custom-title {
+        text-align: center;
+        color: #2E86C1;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 28px;
+        margin-top: 10px;
+    }
+
+    .center-logo {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Mostra logo centrato
+if os.path.exists(logo_path):
+    st.markdown(f"""
+        <div class='center-logo'>
+            <img src="data:image/png;base64,{Image.open(logo_path).convert("RGB").tobytes().hex()}" width="150">
+        </div>
+    """, unsafe_allow_html=True)
+else:
+    st.image(logo_path, width=150)
+
+# Mostra titolo centrato con Montserrat
+st.markdown("<div class='custom-title'>Gestione Magazzino - Cavanna</div>", unsafe_allow_html=True)
+
+
+
+
 authenticator.login(
     fields={
         'Form name': 'Login',

@@ -563,7 +563,7 @@ st.markdown("""
         font-family: 'Montserrat', sans-serif;
         font-size: 28px;
         font-weight: 400;
-        letter-spacing: 3px;
+        letter-spacing: 5px;
         margin-top: 10px;
     }
 
@@ -581,7 +581,7 @@ st.markdown("""
 st.markdown(
     """
     <div class='center-logo'>
-        <img src='https://raw.githubusercontent.com/CavannaSoftware/LogisticsOS/refs/heads/main/logo.png' width='500'>
+        <img src='https://raw.githubusercontent.com/CavannaSoftware/LogisticsOS/refs/heads/main/logo.png' width='750'>
     </div>
     """,
     unsafe_allow_html=True

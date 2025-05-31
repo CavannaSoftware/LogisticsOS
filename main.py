@@ -559,7 +559,7 @@ st.markdown("""
 
     .custom-title {
         text-align: center;
-        color: #2E86C1;
+        color: #30404dff;
         font-family: 'Montserrat', sans-serif;
         font-size: 28px;
         margin-top: 10px;
@@ -572,6 +572,8 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+
+
 
 # ✅ Mostra logo da file locale
 st.markdown(

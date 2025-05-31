@@ -577,7 +577,7 @@ st.markdown("""
 st.markdown(
     """
     <div class='center-logo'>
-        <img src='logo.png' width='150'>
+        <img src='https://raw.githubusercontent.com/CavannaSoftware/LogisticsOS/refs/heads/main/logo.png' width='150'>
     </div>
     """,
     unsafe_allow_html=True

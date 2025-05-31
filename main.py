@@ -593,31 +593,20 @@ st.markdown("<div class='custom-title'>OPERATIONS SYSTEM</div>", unsafe_allow_ht
 
 # === STILE SFONDO COMPATIBILE STREAMLIT ===
 
-
 st.markdown("""
     <style>
-    /* Sfondo immagine */
     html, body, .stApp {
-        background-image: url("https://raw.githubusercontent.com/CavannaSoftware/LogisticsOS/main/sfondo.png");
+        background-image: 
+            linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), 
+            url("https://raw.githubusercontent.com/CavannaSoftware/LogisticsOS/main/sfondo.png");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
     }
-
-    /* Overlay semitrasparente sopra l'intera app */
-    .stApp::before {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(255, 255, 255, 0.6);  /* Bianco al 60% */
-        z-index: -1;
-    }
     </style>
 """, unsafe_allow_html=True)
+
 
 
 

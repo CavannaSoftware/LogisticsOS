@@ -591,10 +591,10 @@ st.markdown(
 # ✅ Testo con font Montserrat
 st.markdown("<div class='custom-title'>OPERATIONS SYSTEM</div>", unsafe_allow_html=True)
 
-# === STILE SFONDO ===
+# === STILE SFONDO COMPATIBILE STREAMLIT ===
 st.markdown("""
     <style>
-    body {
+    html, body, .stApp {
         background-image: url("https://raw.githubusercontent.com/CavannaSoftware/LogisticsOS/main/sfondo.png");
         background-size: cover;
         background-position: center;
@@ -603,6 +603,7 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 
 

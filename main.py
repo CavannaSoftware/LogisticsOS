@@ -565,7 +565,7 @@ st.markdown("""
         font-weight: 400;
         letter-spacing: 20px;
         margin-top: 50px;
-        margin-bottom: 900px; 
+        margin-bottom: 120px; 
     }
 
     .center-logo {
